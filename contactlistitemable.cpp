@@ -1,5 +1,9 @@
 #include "contactlistitemable.h"
 
+
+/*
+ * Will certainly be deleted because of no use
+ */
 ContactListItemable::ContactListItemable(int type)
 {
     this->type = type;

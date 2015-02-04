@@ -22,7 +22,6 @@ SOURCES += main.cpp\
     chat.cpp \
     contactlistitem.cpp \
     settings.cpp \
-    group.cpp \
     grouplistitem.cpp
 
 HEADERS  += mainwindow.h \
@@ -36,7 +35,6 @@ HEADERS  += mainwindow.h \
     contactlistitem.h \
     textdocumentimproved.h \
     settings.h \
-    group.h \
     grouplistitem.h
 
 FORMS    += mainwindow.ui \

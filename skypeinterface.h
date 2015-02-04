@@ -9,7 +9,6 @@
 #include <QDBusAbstractAdaptor>
 #include <QRegExp>
 #include "user.h"
-#include "group.h"
 #include "chatmessage.h"
 #include "chat.h"
 

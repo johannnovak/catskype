@@ -27,65 +27,41 @@ SkypeWindow::SkypeWindow(SkypeInterface* sk, QWidget *parent) :
     ui->msgView->setReadOnly(true);
 }
 
+/*
+ * Ran just after shown
+ */
 void SkypeWindow::run() {
-    this->skype->getGroups();
-    /*ui->contactsView->addItem("Groups");
-
-    ui->contactsView->addItem("Friends");
-    QList<User*> friendList = this->skype->getFriends();
-    QList<User*>::iterator i;
-    for(i=friendList.begin();i!=friendList.end(); ++i) {
-        QIcon* icon;
-        User* user = (User*)*i;
-        QString onlineStatus = user->getOnlineStatus();
-        if(onlineStatus == "ONLINE")
-            icon = new QIcon(":/icons/online.png");
-        if(onlineStatus == "DND")
-            icon = new QIcon(":/icons/dnd.png");
-        if(onlineStatus == "AWAY")
-            icon = new QIcon(":/icons/away.png");
-        if(onlineStatus == "OFFLINE")
-            icon = new QIcon(":/icons/offline.png");
-        ContactListItem* item = new ContactListItem(*icon, user);
-        item->setToolTip(QString("(%1) %2").arg(user->getHandle(), user->getMoodText()));
-        ui->contactsView->addItem(item);
-    }
-    this->activeItem = (ContactListItem*)ui->contactsView->item(0);
-    //ui->contactsView->sortItems();*/
-    this->move(QApplication::desktop()->screen()->rect().center() - this->rect().center());
+    this->skype->getGroups(); // requests groups from Skype (reply given with skypeChatsReceived)
+    this->move(QApplication::desktop()->screen()->rect().center() - this->rect().center()); // center window
 }
 
+/*
+ * Not yet implemented, will be used to remove offline friends from the GUI view
+ */
 void SkypeWindow::removeOffline() {
     ui->contactsView->clear();
     ui->contactsView->addItem("Groups");
-
     ui->contactsView->addItem("Friends");
-    /*FriendList friendList = this->skype->getFriends();
-    FriendList::iterator i;
-    for(i=friendList.begin();i!=friendList.end(); ++i) {
-        QIcon* icon;
-        QString onlineStatus = i.value()["OnlineStatus"];
-        if(onlineStatus == "ONLINE")
-            icon = new QIcon("online.png");
-        if(onlineStatus == "DND")
-            icon = new QIcon("dnd.png");
-        if(onlineStatus == "AWAY")
-            icon = new QIcon("away.png");
-        if(onlineStatus == "OFFLINE")
-            continue;
-        QListWidgetItem* item = new QListWidgetItem(*icon, i.value()["FullName"]);
-        ui->contactsView->addItem(item);
-    }*/
 }
+
+/*
+ * Called when our Notifier notifies something (all Skype events)
+ */
 void SkypeWindow::skypeNotification(QString s) {
     this->addMessage(QString("<font color='grey'>%1</font>").arg(s));
 }
 
+/*
+ * Adds a message to the view
+ */
 void SkypeWindow::addMessage(QString s) {
     ui->msgView->setHtml(QString("%1\n%2").arg(ui->msgView->toHtml(), s));
     ui->msgView->verticalScrollBar()->setValue(ui->msgView->verticalScrollBar()->maximum());
 }
 
+/*
+ * New ChatMessage received (warning: could be ours!)
+ */
 void SkypeWindow::skypeChatMessageStatus(ChatMessage* cm, QString status) {
     if(status != "SENT" && status != "READ") {
         QString body = cm->getBody();
@@ -97,6 +73,10 @@ void SkypeWindow::skypeChatMessageStatus(ChatMessage* cm, QString status) {
 
 }
 
+/*
+ * Called after chats request
+ * Fill the Contact view
+ */
 void SkypeWindow::skypeChatsReceived(QList<Chat *> groups) {
     ui->contactsView->clear();
     ui->contactsView->addItem("Groups");
@@ -129,7 +109,9 @@ void SkypeWindow::skypeChatsReceived(QList<Chat *> groups) {
     this->activeItem = (ContactListItem*)ui->contactsView->item(0);
 }
 
-
+/*
+ * Used to catch when the user press Enter (to send a message)
+ */
 bool SkypeWindow::eventFilter(QObject *object, QEvent *event)
 {
     if (object == ui->msgSend && event->type() == QEvent::KeyPress)
@@ -155,11 +137,18 @@ bool SkypeWindow::eventFilter(QObject *object, QEvent *event)
     }
 }
 
+/*
+ * Called when a friend changes his/her status, update friends view to set the correct icon
+ */
 void SkypeWindow::skypeOnlineStatusChanged(User* u, QString status) {
     QString fullname = u->getFullname();
     ui->contactsView->findItems(fullname,Qt::MatchCaseSensitive).at(0)->setIcon(QIcon(":/icons/"+status.toLower()+".png"));
 }
 
+/*
+ * Absolutely random method to simulate a wizz
+ * Must be redone
+ */
 void SkypeWindow::doWizz() {
     int x0 = this->geometry().topLeft().x();
     int y0 = this->geometry().topLeft().y();

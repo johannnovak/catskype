@@ -1,6 +1,9 @@
 #include "settings.h"
 #include "ui_settings.h"
 
+/*
+ * Settings window, but contains also program settings (chat color, ...)
+ */
 Settings::Settings(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::Settings)

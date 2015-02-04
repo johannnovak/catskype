@@ -2,7 +2,7 @@
 #define GROUPLISTITEM_H
 
 #include <QListWidgetItem>
-#include "group.h"
+#include "chat.h"
 
 class GroupListItem : public QListWidgetItem
 {

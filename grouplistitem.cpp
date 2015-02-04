@@ -1,5 +1,9 @@
 #include "grouplistitem.h"
 
+/*
+ * Same as ContactListItem but for Chats (= group conversations)
+ */
+
 GroupListItem::GroupListItem(Chat* c) : QListWidgetItem(c->getFriendlyName())
 {
     this->chat = c;
