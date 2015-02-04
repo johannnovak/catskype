@@ -1,0 +1,9 @@
+<RCC>
+    <qresource prefix="/icons">
+        <file alias="away.png">resources/away.png</file>
+        <file alias="dnd.png">resources/dnd.png</file>
+        <file alias="offline.png">resources/offline.png</file>
+        <file alias="online.png">resources/online.png</file>
+        <file alias="group.png">resources/group.png</file>
+    </qresource>
+</RCC>

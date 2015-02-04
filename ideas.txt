@@ -1,0 +1,9 @@
+By importance order:
+- keep removed messages
+- custom smileys (from URLs - GIF accepted)
+- text colors
+- edited messages history
+- wizz (like MSN had)
+- custom theme
+- URLs detection (append page title after link - client side)
+- possible friends (require a webserver which list every user's friends)
