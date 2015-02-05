@@ -18,6 +18,13 @@ Chat::Chat(SkypeInterface* sk, QString id)
 }
 
 /*
+ * Dummy chat instance for blocked people
+ */
+Chat::Chat() {
+    // dummy chat instance for blocked people
+}
+
+/*
  * Gets a Chat property from Skype by sending a GET CHAT <id> <property>
  * Returns a QString of the requested property
  */
@@ -69,6 +76,12 @@ QString Chat::getStatus() {
  */
 QList<User*> Chat::getPosters() {
     QList<User*> users;
+    QString rep = this->get("POSTERS");
+    QStringList repList = rep.split(", ");
+    int i;
+    for (i=0;i<repList.length();i++) {
+        users.push_back(new User(this->skype, repList.at(i)));
+    }
     return users;
 }
 
@@ -79,6 +92,12 @@ QList<User*> Chat::getPosters() {
  */
 QList<User*> Chat::getMembers() {
     QList<User*> users;
+    QString rep = this->get("MEMBERS");
+    QStringList repList = rep.split(", ");
+    int i;
+    for (i=0;i<repList.length();i++) {
+        users.push_back(new User(this->skype, repList.at(i)));
+    }
     return users;
 }
 
@@ -107,6 +126,12 @@ QList<ChatMessage*> Chat::getChatMessages() {
  */
 QList<User*> Chat::getActiveMembers() {
     QList<User*> users;
+    QString rep = this->get("ACTIVEMEMBERS");
+    QStringList repList = rep.split(", ");
+    int i;
+    for (i=0;i<repList.length();i++) {
+        users.push_back(new User(this->skype, repList.at(i)));
+    }
     return users;
 }
 

@@ -5,5 +5,6 @@
         <file alias="offline.png">resources/offline.png</file>
         <file alias="online.png">resources/online.png</file>
         <file alias="group.png">resources/group.png</file>
+        <file alias="blocked.png">resources/blocked.png</file>
     </qresource>
 </RCC>

@@ -12,8 +12,7 @@
 #include <QTimer>
 #include <QThread>
 #include "chattab.h"
-#include "contactlistitem.h"
-#include "grouplistitem.h"
+#include "chatlistitem.h"
 #include "textdocumentimproved.h"
 #include "settings.h"
 
@@ -45,7 +44,7 @@ private slots:
 private:
     Ui::SkypeWindow *ui;
     SkypeInterface* skype;
-    ContactListItem* activeItem;
+    ChatListItem* activeItem;
     QList<ChatTab*> tabs;
     Settings* settings;
     void addMessage(QString s);

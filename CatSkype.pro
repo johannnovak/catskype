@@ -20,9 +20,8 @@ SOURCES += main.cpp\
     chattab.cpp \
     chatmessage.cpp \
     chat.cpp \
-    contactlistitem.cpp \
     settings.cpp \
-    grouplistitem.cpp
+    chatlistitem.cpp
 
 HEADERS  += mainwindow.h \
     skypeinterface.h \
@@ -32,10 +31,9 @@ HEADERS  += mainwindow.h \
     chattab.h \
     chatmessage.h \
     chat.h \
-    contactlistitem.h \
     textdocumentimproved.h \
     settings.h \
-    grouplistitem.h
+    chatlistitem.h
 
 FORMS    += mainwindow.ui \
     settings.ui \

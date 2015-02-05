@@ -88,29 +88,35 @@ void SkypeWindow::skypeChatsReceived(QList<Chat *> groups) {
     for(g=groups.begin();g!=groups.end();++g) {
         Chat* group = (Chat*)*g;
         QIcon icon(":/icons/group.png");
-        GroupListItem* item = new GroupListItem(icon, group);
+        ChatListItem* item = new ChatListItem(icon, group);
         ui->contactsView->addItem(item);
     }
     ui->contactsView->addItem("Friends");
     QList<User*> friendList = this->skype->getFriends();
     QList<User*>::iterator i;
     for(i=friendList.begin();i!=friendList.end(); ++i) {
-        QIcon* icon;
-        User* user = (User*)*i;
-        QString onlineStatus = user->getOnlineStatus();
-        if(onlineStatus == "ONLINE")
-            icon = new QIcon(":/icons/online.png");
-        if(onlineStatus == "DND")
-            icon = new QIcon(":/icons/dnd.png");
-        if(onlineStatus == "AWAY")
-            icon = new QIcon(":/icons/away.png");
-        if(onlineStatus == "OFFLINE")
-            icon = new QIcon(":/icons/offline.png");
-        ContactListItem* item = new ContactListItem(*icon, user);
-        item->setToolTip(QString("(%1) %2").arg(user->getHandle(), user->getMoodText()));
-        ui->contactsView->addItem(item);
+        try {
+            QIcon* icon;
+            User* user = (User*)*i;
+            QString onlineStatus = user->getOnlineStatus();
+            if(onlineStatus == "ONLINE")
+                icon = new QIcon(":/icons/online.png");
+            if(onlineStatus == "DND")
+                icon = new QIcon(":/icons/dnd.png");
+            if(onlineStatus == "AWAY")
+                icon = new QIcon(":/icons/away.png");
+            if(onlineStatus == "OFFLINE")
+                icon = new QIcon(":/icons/offline.png");
+            ChatListItem* item = new ChatListItem(*icon, this->skype->createChatWithUser(user));
+            item->setToolTip(QString("(%1) %2").arg(user->getHandle(), user->getMoodText()));
+            ui->contactsView->addItem(item);
+        }
+        catch(QString &e) {
+            // happens if user is blocked... what should we do with it?
+            qDebug() << e;
+        }
     }
-    this->activeItem = (ContactListItem*)ui->contactsView->item(0);
+    this->activeItem = (ChatListItem*)ui->contactsView->item(0);
 }
 
 /*
@@ -124,7 +130,8 @@ bool SkypeWindow::eventFilter(QObject *object, QEvent *event)
         if (keyEvent->key() == Qt::Key_Enter)
         {
             // Special tab handling
-            Chat* c = this->skype->createChatWithUser(this->activeItem->getUser());
+            //Chat* c = this->skype->createChatWithUser(this->activeItem->getUser());
+            Chat* c = this->activeItem->getChat();
             c->sendMessage("<font color=\""+this->settings->getColor().name()+"\">"+ui->msgSend->toPlainText()+"</font>");
             ui->msgSend->setHtml("");
             return true;
@@ -194,9 +201,9 @@ void SkypeWindow::doWizz() {
 void SkypeWindow::on_contactsView_itemClicked(QListWidgetItem *item)
 {
     if(item->text() != "Friends" && item->text() != "Groups") {
-        ContactListItem* i = (ContactListItem*)item;
+        ChatListItem* i = (ChatListItem*)item;
         this->activeItem = i;
-        qDebug() << "Clicked on " << i->getUser()->getHandle();
+        qDebug() << "Clicked on " << i->getChat()->getId();
     }
 }
 void SkypeWindow::openSettings() {

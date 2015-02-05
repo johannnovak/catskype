@@ -139,8 +139,12 @@ Chat* SkypeInterface::createChatWithUser(User* user) {
         return new Chat(this, chatId);
     }
     qDebug() << "Chat not created :'(";
+    throw QString("Blocked user");
 }
 
+/*
+ * Returns current logged user Handle (= skype account)
+ */
 QString SkypeInterface::getProfileHandle() {
     QString reply = this->Call("GET CURRENTUSERHANDLE");
     // CURRENTUSERHANDLE <username>
@@ -149,6 +153,11 @@ QString SkypeInterface::getProfileHandle() {
     return handle;
 }
 
+
+
+/*
+ * Our observer
+ */
 SkypeClientAdapter::SkypeClientAdapter(SkypeInterface *obj) : QDBusAbstractAdaptor(obj)
 {
     client = obj;

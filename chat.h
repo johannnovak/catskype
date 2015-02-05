@@ -12,6 +12,7 @@ class Chat
 {
 public:
     Chat(SkypeInterface*,QString);
+    Chat(); // dummy chat instance for blocked people
     void sendMessage(const QString);
     QString getId();
     QDateTime getCreationDate();
