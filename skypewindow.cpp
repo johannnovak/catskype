@@ -68,7 +68,11 @@ void SkypeWindow::skypeChatMessageStatus(ChatMessage* cm, QString status) {
         if(body.contains(QString("*wizz*"))) {
             this->doWizz();
         }
-        this->addMessage(QString("[%1]%2: %3").arg(cm->getTimeStamp().toString("hh:mm:ss"), cm->getFromDisplayName(), body));
+        QString sender = cm->getFromDisplayName();
+        if(cm->getFromHandle() == this->skype->getProfileHandle()) {
+            sender = QString("<font color=\"blue\">%1</font>").arg(cm->getFromDisplayName());
+        }
+        this->addMessage(QString("<font color=\"grey\">[%1]</font><b>%2</b>: %3").arg(cm->getTimeStamp().toString("hh:mm:ss"), sender, body));
     }
 
 }
@@ -122,7 +126,6 @@ bool SkypeWindow::eventFilter(QObject *object, QEvent *event)
             // Special tab handling
             Chat* c = this->skype->createChatWithUser(this->activeItem->getUser());
             c->sendMessage("<font color=\""+this->settings->getColor().name()+"\">"+ui->msgSend->toPlainText()+"</font>");
-            //ui->msgSend->toPlainText());
             ui->msgSend->setHtml("");
             return true;
         }

@@ -141,7 +141,13 @@ Chat* SkypeInterface::createChatWithUser(User* user) {
     qDebug() << "Chat not created :'(";
 }
 
-
+QString SkypeInterface::getProfileHandle() {
+    QString reply = this->Call("GET CURRENTUSERHANDLE");
+    // CURRENTUSERHANDLE <username>
+    QString handle = reply.right(reply.length() - 18);
+    qDebug() << "PROFILE HANDLE = " << handle;
+    return handle;
+}
 
 SkypeClientAdapter::SkypeClientAdapter(SkypeInterface *obj) : QDBusAbstractAdaptor(obj)
 {

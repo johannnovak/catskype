@@ -45,6 +45,7 @@ public:
     QString getFullName(QString handle);
     QString getOnlineStatus(QString handle);
     Chat* createChatWithUser(User* username);
+    QString getProfileHandle();
     ~SkypeInterface();
 
 signals:
