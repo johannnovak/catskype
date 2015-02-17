@@ -74,6 +74,7 @@ void SkypeWindow::addMessage(QString s) {
  * New ChatMessage received (warning: could be ours!)
  */
 void SkypeWindow::skypeChatMessageStatus(ChatMessage* cm, QString status) {
+    qDebug() << "Message " << status;
     if(status != "SENT" && status != "READ") {
         QString body = cm->getBody();
         if(body.contains(QString("*wizz*"))) {
@@ -83,6 +84,7 @@ void SkypeWindow::skypeChatMessageStatus(ChatMessage* cm, QString status) {
         if(cm->getFromHandle() == this->skype->getProfileHandle()) {
             sender = QString("<font color=\"blue\">%1</font>").arg(cm->getFromDisplayName());
         }
+        qDebug() << "Okay";
         this->addMessage(QString("<font color=\"grey\">[%1]</font><b>%2</b>: %3").arg(cm->getTimeStamp().toString("hh:mm:ss"), sender, body));
     }
 

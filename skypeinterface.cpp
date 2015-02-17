@@ -39,6 +39,15 @@ QDBusReply<QString> SkypeInterface::_Call(const QString& command) {
         qDebug() << "SKYPE C> " << command;
         reply = this->skypeInterface->call("Invoke", command);
         qDebug() << "SKYPE <R " << reply;
+
+        QRegExp exp("CHATMESSAGE (\\d+) STATUS (\\w+)");
+        if(exp.indexIn(reply) != -1) {
+            // matched!
+            QString id = exp.cap(1);
+            QString status = exp.cap(2);
+            emit ChatMessageStatus(new ChatMessage(this, id), status);
+        }
+
     } else {
         qDebug() << "Something wrong happened";
     }
@@ -97,7 +106,9 @@ void SkypeInterface::Notify(const QString &msg) {
         // matched!
         QString id = exp.cap(1);
         QString status = exp.cap(2);
-        emit ChatMessageStatus(new ChatMessage(this, id), status);
+        ChatMessage* cm = new ChatMessage(this, id);
+        if(cm->getFromHandle() != this->getProfileHandle())
+            emit ChatMessageStatus(cm, status);
     }
     exp.setPattern("USER (\\w+) ONLINESTATUS (\\w+)");
     if(exp.indexIn(msg) != -1) {
