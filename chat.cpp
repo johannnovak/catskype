@@ -2,9 +2,8 @@
 #include "skypeinterface.h"
 
 /*
-* Represents a Chat object (group conversation)
+* Represents a Chat object (group or 1:1 conversation)
 */
-
 
 /*
  * Arguments are:

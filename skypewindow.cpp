@@ -8,6 +8,7 @@ SkypeWindow::SkypeWindow(SkypeInterface* sk, QWidget *parent) :
     ui->setupUi(this);
     this->settings = new Settings(this);
     this->skype = sk;
+
     QList<int> sizes;
     sizes << 250 << 0;
     ui->splitter->setSizes(sizes);
@@ -15,15 +16,21 @@ SkypeWindow::SkypeWindow(SkypeInterface* sk, QWidget *parent) :
     QList<int> sizes2;
     sizes2 << 0 << 250;
     ui->splitter_3->setSizes(sizes2);
+
     connect(ui->actionSettings, SIGNAL(triggered()), this, SLOT(openSettings()));
     connect(ui->actionRemove_offline, SIGNAL(triggered()), this, SLOT(removeOffline()));
     connect(this->skype, SIGNAL(skypeNotification(QString)), this, SLOT(skypeNotification(QString)));
     connect(this->skype, SIGNAL(ChatMessageStatus(ChatMessage*, QString)), this, SLOT(skypeChatMessageStatus(ChatMessage*, QString)));
     connect(this->skype, SIGNAL(OnlineStatusChanged(User*,QString)), this, SLOT(skypeOnlineStatusChanged(User*,QString)));
     connect(this->skype, SIGNAL(ChatsReceived(QList<Chat*>)), this, SLOT(skypeChatsReceived(QList<Chat*>)));
+
+
     TextDocumentImproved* tdi = new TextDocumentImproved();
     ui->msgView->setDocument(tdi);
+
+
     ui->msgSend->installEventFilter(this);
+
     ui->msgView->setReadOnly(true);
 }
 
@@ -48,15 +55,19 @@ void SkypeWindow::removeOffline() {
  * Called when our Notifier notifies something (all Skype events)
  */
 void SkypeWindow::skypeNotification(QString s) {
-    this->addMessage(QString("<font color='grey'>%1</font>").arg(s));
+    //this->addMessage(QString("<font color='grey'>%1</font>").arg(s));
+    qDebug() << s;
 }
 
 /*
  * Adds a message to the view
  */
 void SkypeWindow::addMessage(QString s) {
+
     ui->msgView->setHtml(QString("%1\n%2").arg(ui->msgView->toHtml(), s));
     ui->msgView->verticalScrollBar()->setValue(ui->msgView->verticalScrollBar()->maximum());
+    if(ui->contactsView->count() != 0)
+        this->activeItem->setConversationString(QString("%1<br>%2").arg(this->activeItem->getConversationString(), s));
 }
 
 /*
@@ -87,10 +98,14 @@ void SkypeWindow::skypeChatsReceived(QList<Chat *> groups) {
     QList<Chat*>::iterator g;
     for(g=groups.begin();g!=groups.end();++g) {
         Chat* group = (Chat*)*g;
-        QIcon icon(":/icons/group.png");
-        ChatListItem* item = new ChatListItem(icon, group);
-        ui->contactsView->addItem(item);
+        if(group->getStatus() == "MULTI_SUBSCRIBED") {
+            // real group
+            QIcon icon(":/icons/group.png");
+            ChatListItem* item = new ChatListItem(icon, group);
+            ui->contactsView->addItem(item);
+        }
     }
+
     ui->contactsView->addItem("Friends");
     QList<User*> friendList = this->skype->getFriends();
     QList<User*>::iterator i;
@@ -127,7 +142,7 @@ bool SkypeWindow::eventFilter(QObject *object, QEvent *event)
     if (object == ui->msgSend && event->type() == QEvent::KeyPress)
     {
         QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
-        if (keyEvent->key() == Qt::Key_Enter)
+        if (keyEvent->key() == Qt::Key_Enter || keyEvent->key() == Qt::Key_Return)
         {
             // Special tab handling
             //Chat* c = this->skype->createChatWithUser(this->activeItem->getUser());
@@ -205,6 +220,11 @@ void SkypeWindow::on_contactsView_itemClicked(QListWidgetItem *item)
     if(item->text() != "Friends" && item->text() != "Groups") {
         ChatListItem* i = (ChatListItem*)item;
         this->activeItem = i;
+        ui->msgView->clear();
+        ui->msgView->setHtml(this->activeItem->getConversationString());
+
+        ui->msgView->verticalScrollBar()->setValue(ui->msgView->verticalScrollBar()->maximum());
+
         qDebug() << "Clicked on " << i->getChat()->getId();
     }
 }

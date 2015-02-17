@@ -11,8 +11,11 @@ public:
     ChatListItem(QIcon&, Chat*);
     Chat* getChat();
     QString getMessages();
+    QString getConversationString();
+    void setConversationString(QString);
 private:
     Chat* chat;
+    QString conversationString;
 };
 
 #endif // CONTACTLISTITEM_H

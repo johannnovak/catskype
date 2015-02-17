@@ -29,9 +29,6 @@ void SkypeInterface::Attach() {
         qDebug() << "Register problem";
     }
 
-    // get friends
-
-
     this->init = true;
     emit skypeConnected();
 }
