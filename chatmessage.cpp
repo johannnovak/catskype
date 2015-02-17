@@ -93,7 +93,7 @@ QString ChatMessage::getStatus() {
  * Not yet implemented
  */
 QString ChatMessage::getChatName() {
-    return QString();
+    return this->get("CHATNAME");
 }
 
 /*

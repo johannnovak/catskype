@@ -66,15 +66,14 @@ void SkypeWindow::addMessage(QString s) {
 
     ui->msgView->setHtml(QString("%1\n%2").arg(ui->msgView->toHtml(), s));
     ui->msgView->verticalScrollBar()->setValue(ui->msgView->verticalScrollBar()->maximum());
-    if(ui->contactsView->count() != 0)
-        this->activeItem->setConversationString(QString("%1<br>%2").arg(this->activeItem->getConversationString(), s));
+    /*if(ui->contactsView->count() != 0)
+        this->activeItem->setConversationString(QString("%1<br>%2").arg(this->activeItem->getConversationString(), s));*/
 }
 
 /*
  * New ChatMessage received (warning: could be ours!)
  */
 void SkypeWindow::skypeChatMessageStatus(ChatMessage* cm, QString status) {
-    qDebug() << "Message " << status;
     if(status != "SENT" && status != "READ") {
         QString body = cm->getBody();
         if(body.contains(QString("*wizz*"))) {
@@ -84,8 +83,22 @@ void SkypeWindow::skypeChatMessageStatus(ChatMessage* cm, QString status) {
         if(cm->getFromHandle() == this->skype->getProfileHandle()) {
             sender = QString("<font color=\"blue\">%1</font>").arg(cm->getFromDisplayName());
         }
-        qDebug() << "Okay";
-        this->addMessage(QString("<font color=\"grey\">[%1]</font><b>%2</b>: %3").arg(cm->getTimeStamp().toString("hh:mm:ss"), sender, body));
+
+        int i;
+        for(i=0;i<ui->contactsView->count();i++) {
+            QListWidgetItem* row = ui->contactsView->item(i);
+            if(!(row->text() == "Friends" || row->text() == "Groups")) {
+                ChatListItem* cli = (ChatListItem*)ui->contactsView->item(i);
+                Chat* chat = cli->getChat();
+                qDebug() << chat->getId() << " =? " << cm->getChatName();
+                if(chat->getId() == cm->getChatName()) {
+                    cli->setConversationString(QString("%1<br><font color=\"grey\">[%2]</font> <b>%3</b>: %4").arg(cli->getConversationString(), cm->getTimeStamp().toString("hh:mm:ss"), sender, body));
+                    if(cli == this->activeItem) {
+                        this->addMessage(QString("<font color=\"grey\">[%1]</font> <b>%2</b>: %3").arg(cm->getTimeStamp().toString("hh:mm:ss"), sender, body));
+                    }
+                }
+            }
+        }
     }
 
 }
