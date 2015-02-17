@@ -132,7 +132,9 @@ bool SkypeWindow::eventFilter(QObject *object, QEvent *event)
             // Special tab handling
             //Chat* c = this->skype->createChatWithUser(this->activeItem->getUser());
             Chat* c = this->activeItem->getChat();
-            c->sendMessage("<font color=\""+this->settings->getColor().name()+"\">"+ui->msgSend->toPlainText()+"</font>");
+            QString text = ui->msgSend->toPlainText();
+            text.replace("\n","<br>");
+            c->sendMessage("<font color=\""+this->settings->getColor().name()+"\">"+text+"</font>");
             ui->msgSend->setHtml("");
             return true;
         }
