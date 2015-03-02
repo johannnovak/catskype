@@ -92,7 +92,7 @@ QList<User*> Chat::getPosters() {
 QList<User*> Chat::getMembers() {
     QList<User*> users;
     QString rep = this->get("MEMBERS");
-    QStringList repList = rep.split(", ");
+    QStringList repList = rep.split(" ");
     int i;
     for (i=0;i<repList.length();i++) {
         users.push_back(new User(this->skype, repList.at(i)));

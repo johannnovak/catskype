@@ -6,6 +6,7 @@ SkypeWindow::SkypeWindow(SkypeInterface* sk, QWidget *parent) :
     QMainWindow(parent),ui(new Ui::SkypeWindow)
 {
     ui->setupUi(this);
+    this->setWindowIcon(QIcon(":/icons/icon.png"));
     this->settings = new Settings(this);
     this->skype = sk;
 
@@ -76,10 +77,13 @@ void SkypeWindow::addMessage(QString s) {
 void SkypeWindow::skypeChatMessageStatus(ChatMessage* cm, QString status) {
     if(status != "SENT" && status != "READ") {
         QString body = cm->getBody();
+        body.replace("\n","<br>");
+
         if(body.contains(QString("*wizz*"))) {
             this->doWizz();
         }
         QString sender = cm->getFromDisplayName();
+        qDebug() << "ChatMessage received from " << sender << " : " << body;
         if(cm->getFromHandle() == this->skype->getProfileHandle()) {
             sender = QString("<font color=\"blue\">%1</font>").arg(cm->getFromDisplayName());
         }
@@ -90,7 +94,6 @@ void SkypeWindow::skypeChatMessageStatus(ChatMessage* cm, QString status) {
             if(!(row->text() == "Friends" || row->text() == "Groups")) {
                 ChatListItem* cli = (ChatListItem*)ui->contactsView->item(i);
                 Chat* chat = cli->getChat();
-                qDebug() << chat->getId() << " =? " << cm->getChatName();
                 if(chat->getId() == cm->getChatName()) {
                     cli->setConversationString(QString("%1<br><font color=\"grey\">[%2]</font> <b>%3</b>: %4").arg(cli->getConversationString(), cm->getTimeStamp().toString("hh:mm:ss"), sender, body));
                     if(cli == this->activeItem) {
@@ -164,7 +167,19 @@ bool SkypeWindow::eventFilter(QObject *object, QEvent *event)
             Chat* c = this->activeItem->getChat();
             QString text = ui->msgSend->toPlainText();
             text.replace("\n","<br>");
-            c->sendMessage("<font color=\""+this->settings->getColor().name()+"\">"+text+"</font>");
+            if(this->settings->getBold()) {
+                if(this->settings->getColor().name() == "#000000") {
+                    c->sendMessage("<b>"+text+"</b>");
+                } else {
+                    c->sendMessage("<b><font color=\""+this->settings->getColor().name()+"\">"+text+"</font></b>");
+                }
+            } else {
+                if(this->settings->getColor().name() == "#000000") {
+                    c->sendMessage(text);
+                } else {
+                    c->sendMessage("<font color=\""+this->settings->getColor().name()+"\">"+text+"</font>");
+                }
+            }
             ui->msgSend->setHtml("");
             return true;
         }
@@ -241,6 +256,27 @@ void SkypeWindow::on_contactsView_itemClicked(QListWidgetItem *item)
         ui->msgView->verticalScrollBar()->setValue(ui->msgView->verticalScrollBar()->maximum());
 
         qDebug() << "Clicked on " << i->getChat()->getId();
+        if(this->activeItem->getChat()->getStatus() == "MULTI_SUBSCRIBED") {
+            ui->onlineView->setVisible(true);
+            ui->onlineView->clear();
+            int i;
+            for(i=0;i<this->activeItem->getChat()->getMembers().size();i++) {
+                User* user = this->activeItem->getChat()->getMembers().at(i);
+                QString onlineStatus = user->getOnlineStatus();
+                QIcon* icon;
+                if(onlineStatus == "ONLINE")
+                    icon = new QIcon(":/icons/online.png");
+                if(onlineStatus == "DND")
+                    icon = new QIcon(":/icons/dnd.png");
+                if(onlineStatus == "AWAY")
+                    icon = new QIcon(":/icons/away.png");
+                if(onlineStatus == "OFFLINE")
+                    icon = new QIcon(":/icons/offline.png");
+                ui->onlineView->addItem(new QListWidgetItem(*icon, user->getFullname()));
+            }
+        } else {
+            ui->onlineView->setVisible(false);
+        }
     }
 }
 void SkypeWindow::openSettings() {
